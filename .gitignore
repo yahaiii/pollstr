@@ -39,3 +39,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local env files
+.env.local
+
+
+# need to know
+AUTHENTICATION_TESTING.md
+DATABASE_SETUP_COMPLETE.md
+SETUP.md
+TESTING_GUIDE.md
+supabase-schema.sql

@@ -3,6 +3,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +18,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { createPoll, getCurrentUser } from "@/lib/supabase";
 
 const formSchema = z.object({
   question: z.string().min(5, {
     message: "Question must be at least 5 characters.",
+  }),
+  description: z.string().min(10, {
+    message: "Description must be at least 10 characters.",
   }),
   options: z.array(
     z.string().min(1, {
@@ -31,17 +37,44 @@ const formSchema = z.object({
 });
 
 export function PollForm() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       question: "",
+      description: "",
       options: ["", ""],
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // TODO: Submit to API
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        throw new Error("You must be logged in to create a poll");
+      }
+
+      await createPoll({
+        title: values.question,
+        description: values.description,
+        options: values.options.filter(option => option.trim() !== ""),
+        userId: user.id,
+        userName: user.user_metadata?.name || user.email || "Anonymous",
+      });
+
+      router.push("/polls");
+    } catch (error: unknown) {
+      console.error("Error creating poll:", error);
+      setError(error instanceof Error ? error.message : "Failed to create poll");
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const addOption = () => {
@@ -81,6 +114,23 @@ export function PollForm() {
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter a description for your poll" {...field} />
+                  </FormControl>
+                  <FormDescription>
+                    Provide additional context for your poll.
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="space-y-4">
               {form.watch("options").map((option, index) => (
                 <FormField
@@ -110,11 +160,19 @@ export function PollForm() {
               ))}
             </div>
 
+            {error && (
+              <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md">
+                {error}
+              </div>
+            )}
+
             <div className="flex gap-4">
               <Button type="button" variant="outline" onClick={addOption}>
                 Add Option
               </Button>
-              <Button type="submit">Create Poll</Button>
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Creating..." : "Create Poll"}
+              </Button>
             </div>
           </form>
         </Form>

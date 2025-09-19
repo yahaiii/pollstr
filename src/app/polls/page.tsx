@@ -1,38 +1,31 @@
 import { PollList } from "@/components/PollList";
+import { getPolls } from "@/lib/supabase";
+import { Poll } from "@/types";
 
-// This would typically come from an API or database
-const mockPolls = [
-  {
-    id: "1",
-    title: "Favorite Programming Language",
-    description: "What's your go-to programming language?",
-    options: [
-      { id: "1", text: "JavaScript", votes: 0 },
-      { id: "2", text: "Python", votes: 0 },
-      { id: "3", text: "TypeScript", votes: 0 },
-    ],
-    createdAt: new Date(),
-    createdBy: "user1",
-  },
-  {
-    id: "2",
-    title: "Best Frontend Framework",
-    description: "Which frontend framework do you prefer?",
-    options: [
-      { id: "1", text: "React", votes: 0 },
-      { id: "2", text: "Vue", votes: 0 },
-      { id: "3", text: "Angular", votes: 0 },
-    ],
-    createdAt: new Date(),
-    createdBy: "user1",
-  },
-];
+export default async function PollsPage() {
+  let polls: Poll[] = [];
+  let error: string | null = null;
 
-export default function PollsPage() {
+  try {
+    polls = await getPolls();
+  } catch (err) {
+    console.error("Error fetching polls:", err);
+    error = "Failed to load polls. Please check your database connection.";
+  }
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-4xl font-bold mb-8">Polls</h1>
-      <PollList polls={mockPolls} />
+      {error ? (
+        <div className="text-red-600 bg-red-50 p-4 rounded-md">
+          {error}
+          <p className="text-sm mt-2">
+            Make sure your Supabase database is set up correctly and the tables exist.
+          </p>
+        </div>
+      ) : (
+        <PollList polls={polls} />
+      )}
     </div>
   );
 }
