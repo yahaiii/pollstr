@@ -18,24 +18,18 @@ import Link from "next/link";
 import { signIn, signUp } from "@/lib/supabase";
 import { useState } from "react";
 
-const getAuthFormSchema = (mode: "login" | "register") => {
-  const baseSchema = {
-    email: z.string().email("Invalid email address"),
-    password: z.string().min(8, "Password must be at least 8 characters"),
-  };
 
-  if (mode === "register") {
-    return z.object({
-      ...baseSchema,
-      name: z.string().min(2, "Name must be at least 2 characters"),
-    });
-  }
+const loginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+});
+const registerSchema = loginSchema.extend({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+});
 
-  return z.object({
-    ...baseSchema,
-  });
-};
-type AuthFormValues = z.infer<ReturnType<typeof getAuthFormSchema>>;
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
+type AuthFormValues = LoginFormValues | RegisterFormValues;
 
 interface AuthFormProps {
   mode: "login" | "register";
@@ -48,12 +42,10 @@ export function AuthForm({ mode }: AuthFormProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   const form = useForm<AuthFormValues>({
-    resolver: zodResolver(getAuthFormSchema(mode)),
-    defaultValues: {
-      email: "",
-      password: "",
-      name: "",
-    },
+    resolver: zodResolver(mode === "register" ? registerSchema : loginSchema),
+    defaultValues: mode === "register"
+      ? { email: "", password: "", name: "" }
+      : { email: "", password: "" },
   });
 
   const onSubmit = async (data: AuthFormValues) => {
@@ -61,7 +53,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
-  
+
     try {
       if (mode === "login") {
         console.log('🔐 Attempting login...');
@@ -71,16 +63,17 @@ export function AuthForm({ mode }: AuthFormProps) {
           throw new Error(result.error.message);
         }
         console.log('✅ Login successful, redirecting to /polls');
-        // Small delay to ensure auth state updates
         setTimeout(() => {
           router.push("/polls");
         }, 100);
       } else {
-        if (!data.name) {
+        const { email, password, name } = data as RegisterFormValues;
+        if (!name) {
           throw new Error("Name is required for registration");
-} else {
-  console.log('📝 Attempting registration...');
-  const { error } = await signUp(data.email, data.password, data.name);        if (error) {
+        }
+        console.log('📝 Attempting registration...');
+        const { error } = await signUp(email, password, name);
+        if (error) {
           console.error('❌ Registration failed:', error.message);
           throw new Error(error.message);
         }
