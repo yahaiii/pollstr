@@ -235,6 +235,7 @@ export async function getPolls(): Promise<Poll[]> {
       description: poll.description,
       createdAt: new Date(poll.created_at),
       createdBy: poll.created_by,
+      userId: poll.user_id,
       options: poll.poll_options.map((option: { id: number; text: string; votes: number }) => ({
         id: option.id,
         text: option.text,
@@ -271,12 +272,34 @@ export async function getPoll(id: number): Promise<Poll | null> {
     description: poll.description,
     createdAt: new Date(poll.created_at),
     createdBy: poll.created_by,
+    userId: poll.user_id,
     options: poll.poll_options.map((option: { id: number; text: string; votes: number }) => ({
       id: option.id,
       text: option.text,
       votes: option.votes,
     })),
   };
+}
+
+export async function updatePoll(pollId: number, updates: { title?: string; description?: string }) {
+  const { data, error } = await supabase
+    .from('polls')
+    .update(updates)
+    .eq('id', pollId)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deletePoll(pollId: number) {
+  const { error } = await supabase
+    .from('polls')
+    .delete()
+    .eq('id', pollId);
+  if (error) throw error;
+  return { success: true };
 }
 
 export async function voteOnPoll(pollId: number, optionId: number, userId: string) {

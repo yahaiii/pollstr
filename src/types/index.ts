@@ -5,6 +5,7 @@ export interface Poll {
   options: PollOption[];
   createdAt: Date;
   createdBy: string;
+  userId: string; // owner user id
 }
 
 export interface PollOption {

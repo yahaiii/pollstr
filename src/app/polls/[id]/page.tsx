@@ -1,6 +1,7 @@
 import { getPoll } from "@/lib/supabase";
 import { PollVoting } from "@/components/PollVoting";
 import { notFound } from "next/navigation";
+import PollOwnerActions from "@/components/PollOwnerActions";
 
 export default async function PollPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -28,6 +29,8 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
             <span>{poll.createdAt.toLocaleDateString()}</span>
             <span>•</span>
             <span>{poll.options.length} options</span>
+            <span className="flex-1" />
+            <PollOwnerActions poll={poll} />
           </div>
         </div>
         

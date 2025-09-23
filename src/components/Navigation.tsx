@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -12,6 +13,9 @@ export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
+  const displayName = (user?.user_metadata?.name as string | undefined) || user?.email || "User";
+  const initial = displayName.charAt(0).toUpperCase();
+  const avatarUrl = (user?.user_metadata?.avatar_url as string | undefined) || (user?.user_metadata?.picture as string | undefined);
 
   const handleSignOut = async () => {
     try {
@@ -44,9 +48,23 @@ export function Navigation() {
           
           {user ? (
               <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  {user.user_metadata?.name || user.email}
-                </span>
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt={displayName}
+                    width={32}
+                    height={32}
+                    className="rounded-full object-cover border"
+                  />
+                ) : (
+                  <div
+                    className="w-8 h-8 rounded-full bg-gray-200 text-gray-700 flex items-center justify-center text-sm font-medium border"
+                    aria-label={displayName}
+                    title={displayName}
+                  >
+                    {initial}
+                  </div>
+                )}
                 <Button variant="outline" size="sm" onClick={handleSignOut}>
                   Sign Out
                 </Button>

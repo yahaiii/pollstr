@@ -94,11 +94,6 @@ CREATE POLICY "Authenticated users can create votes" ON votes
       WHERE po.id = votes.option_id
       AND p.id = votes.poll_id
     )
-    AND NOT EXISTS (
-      SELECT 1 FROM votes v2
-      WHERE v2.poll_id = votes.poll_id
-      AND v2.user_id = votes.user_id
-    )
   );
 
 -- Create function to increment vote count with proper security
