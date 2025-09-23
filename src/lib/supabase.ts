@@ -1,9 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { Poll } from '@/types';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing required Supabase environment variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY');
+}
 // Client-side Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -99,7 +103,7 @@ export interface Database {
 
 // Auth functions
 export async function signIn(email: string, password: string) {
-  console.log('🔐 Attempting to sign in:', email);
+  console.log('🔐 Attempting to sign in:');
   const result = await supabase.auth.signInWithPassword({
     email,
     password,
@@ -108,7 +112,7 @@ export async function signIn(email: string, password: string) {
   if (result.error) {
     console.error('❌ Sign in error:', result.error.message);
   } else {
-    console.log('✅ Sign in successful:', result.data.user?.email);
+    console.log('✅ Sign in successful:');
   }
   
   return result;
@@ -160,7 +164,7 @@ export async function getCurrentUser() {
 }
 
 // Listen to auth state changes
-export function onAuthStateChange(callback: (user: any) => void) {
+export function onAuthStateChange(callback: (user: User | null) => void) {
   return supabase.auth.onAuthStateChange((event, session) => {
     console.log('🔄 Auth state changed:', event, session?.user?.email || 'No user');
     callback(session?.user || null);
@@ -276,26 +280,46 @@ export async function getPoll(id: number): Promise<Poll | null> {
 }
 
 export async function voteOnPoll(pollId: number, optionId: number, userId: string) {
+  console.log('🗳️ Attempting to vote:', { pollId, optionId, userId });
+  
   // The RLS policy and trigger will handle duplicate vote prevention and count increment
-  const { error: voteError } = await supabase
+  const { data, error: voteError } = await supabase
     .from('votes')
     .insert({
       poll_id: pollId,
       option_id: optionId,
       user_id: userId,
-    });
+    })
+    .select();
 
   if (voteError) {
+    console.error('❌ Vote error:', {
+      message: voteError.message,
+      code: voteError.code,
+      details: voteError.details,
+      hint: voteError.hint,
+      fullError: voteError
+    });
+    
     if (voteError.code === '23505') { // Unique constraint violation
       throw new Error('You have already voted on this poll');
     }
-    throw voteError;
+    
+    // More specific error messages based on common RLS issues
+    if (voteError.message?.includes('new row violates row-level security policy')) {
+      throw new Error('Unable to vote due to security policy. Please make sure you are logged in and the poll exists.');
+    }
+    
+    throw new Error(voteError.message || 'Failed to vote');
   }
 
+  console.log('✅ Vote successful:', data);
   return { success: true };
 }
 
 export async function hasUserVoted(pollId: number, userId: string): Promise<boolean> {
+  console.log('🔍 Checking if user voted:', { pollId, userId });
+  
   const { data, error } = await supabase
     .from('votes')
     .select('id')
@@ -303,6 +327,12 @@ export async function hasUserVoted(pollId: number, userId: string): Promise<bool
     .eq('user_id', userId)
     .single();
 
-  if (error && error.code !== 'PGRST116') throw error;
-  return !!data;
+  if (error && error.code !== 'PGRST116') {
+    console.error('❌ Error checking vote status:', error);
+    throw error;
+  }
+  
+  const hasVoted = !!data;
+  console.log('✅ Vote status check result:', hasVoted);
+  return hasVoted;
 }

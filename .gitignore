@@ -44,9 +44,5 @@ next-env.d.ts
 .env.local
 
 
-# need to know
-AUTHENTICATION_TESTING.md
-DATABASE_SETUP_COMPLETE.md
-SETUP.md
-TESTING_GUIDE.md
-supabase-schema.sql
+# Add only truly sensitive files here if needed
+# Example: sensitive-config.json

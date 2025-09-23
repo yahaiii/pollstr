@@ -18,26 +18,18 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { createPoll, getCurrentUser } from "@/lib/supabase";
+import { useAuth } from "@/hooks/useAuth";
+import { createPoll } from "@/lib/supabase";
 
 const formSchema = z.object({
-  question: z.string().min(5, {
-    message: "Question must be at least 5 characters.",
-  }),
-  description: z.string().min(10, {
-    message: "Description must be at least 10 characters.",
-  }),
-  options: z.array(
-    z.string().min(1, {
-      message: "Option must not be empty.",
-    })
-  ).min(2, {
-    message: "You must provide at least 2 options.",
-  }),
+  question: z.string().min(1, "Question is required"),
+  description: z.string().optional(),
+  options: z.array(z.string()).min(2, "At least 2 options are required"),
 });
 
 export function PollForm() {
   const router = useRouter();
+  const { user } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -53,21 +45,25 @@ export function PollForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     setError(null);
-
+  
     try {
-      const user = await getCurrentUser();
       if (!user) {
         throw new Error("You must be logged in to create a poll");
       }
-
+  
+      const options = values.options.filter(option => option.trim() !== "");
+      if (options.length < 2) {
+        throw new Error("At least two options are required to create a poll");
+      }
+  
       await createPoll({
         title: values.question,
-        description: values.description,
-        options: values.options.filter(option => option.trim() !== ""),
+        description: values.description || "",
+        options,
         userId: user.id,
         userName: user.user_metadata?.name || user.email || "Anonymous",
       });
-
+  
       router.push("/polls");
     } catch (error: unknown) {
       console.error("Error creating poll:", error);

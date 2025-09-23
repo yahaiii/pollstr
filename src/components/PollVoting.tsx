@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { Poll } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { voteOnPoll, hasUserVoted, getCurrentUser } from "@/lib/supabase";
+import { voteOnPoll, hasUserVoted } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import { ClientOnly } from "./ClientOnly";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PollVotingProps {
   poll: Poll;
@@ -17,26 +18,23 @@ export function PollVoting({ poll }: PollVotingProps) {
   const [hasVoted, setHasVoted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: { name?: string } } | null>(null);
   const router = useRouter();
+  const { user } = useAuth();
 
   useEffect(() => {
-    const checkUserAndVoteStatus = async () => {
+    const checkVoteStatus = async () => {
       try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-        
-        if (currentUser) {
-          const voted = await hasUserVoted(poll.id, currentUser.id);
+        if (user) {
+          const voted = await hasUserVoted(poll.id, user.id);
           setHasVoted(voted);
         }
       } catch (error) {
-        console.error("Error checking user and vote status:", error);
+        console.error("Error checking vote status:", error);
       }
     };
 
-    checkUserAndVoteStatus();
-  }, [poll.id]);
+    checkVoteStatus();
+  }, [poll.id, user]);
 
   const handleVote = async () => {
     if (!selectedOption || !user) return;

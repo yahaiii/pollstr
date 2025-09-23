@@ -3,43 +3,20 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { signOut, getCurrentUser, onAuthStateChange } from "@/lib/supabase";
-import { useEffect, useState } from "react";
-import { ClientOnly } from "./ClientOnly";
+import { useAuth } from "@/hooks/useAuth";
+import { signOut } from "@/lib/supabase";
+
+// The rest of the component...
 
 export function Navigation() {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState<{ id: string; email?: string; user_metadata?: { name?: string } } | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
-      } catch (error) {
-        console.error("Error checking user:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkUser();
-
-    // Listen to auth state changes
-    const { data: { subscription } } = onAuthStateChange((user) => {
-      setUser(user);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const { user } = useAuth();
 
   const handleSignOut = async () => {
     try {
       await signOut();
-      setUser(null);
+      // The user state will be automatically updated by the auth hook after signOut
       router.push("/polls");
     } catch (error) {
       console.error("Error signing out:", error);
@@ -65,12 +42,7 @@ export function Navigation() {
             </Button>
           </Link>
           
-          <ClientOnly
-            fallback={<div className="w-20 h-8 bg-gray-200 rounded animate-pulse" />}
-          >
-            {isLoading ? (
-              <div className="w-20 h-8 bg-gray-200 rounded animate-pulse" />
-            ) : user ? (
+          {user ? (
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600">
                   {user.user_metadata?.name || user.email}
@@ -89,7 +61,6 @@ export function Navigation() {
                 </Button>
               </div>
             )}
-          </ClientOnly>
         </div>
       </div>
     </nav>
