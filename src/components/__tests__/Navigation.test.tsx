@@ -12,27 +12,18 @@ jest.mock('next/navigation', () => ({
 }));
 import { render, screen } from '@testing-library/react';
 import { Navigation } from '../Navigation';
-import { AuthContext } from '../../context/AuthContext';
-import React from 'react';
+import { withProviders } from '@/test-utils';
+import type { User } from '@/types';
 
-const mockUser = {
+const mockUser: User = {
   id: '1',
   email: 'test@test.com',
-  app_metadata: {},
-  user_metadata: {},
-  aud: 'authenticated',
-  created_at: new Date().toISOString(),
+  name: 'Test User',
 };
 
 describe('Navigation', () => {
-  const wrapper = (children: React.ReactNode) => (
-    <AuthContext.Provider value={{ user: mockUser, session: null }}>
-      {children}
-    </AuthContext.Provider>
-  );
-
   it('renders navigation links', () => {
-    render(wrapper(<Navigation />));
+    render(withProviders(<Navigation />, { user: mockUser }));
     expect(screen.getByRole('navigation')).toBeInTheDocument();
     expect(screen.getByText(/pollstr/i)).toBeInTheDocument();
   });

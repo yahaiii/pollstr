@@ -11,34 +11,25 @@ jest.mock('next/navigation', () => ({
 }));
 import { render, screen, fireEvent } from '@testing-library/react';
 import { PollForm } from '../PollForm';
-import { AuthContext } from '../../context/AuthContext';
-import React from 'react';
+import { withProviders } from '@/test-utils';
+import type { User } from '@/types';
 
-const mockUser = {
+const mockUser: User = {
   id: '1',
   email: 'test@test.com',
-  app_metadata: {},
-  user_metadata: {},
-  aud: 'authenticated',
-  created_at: new Date().toISOString(),
+  name: 'Test User',
 };
 
 describe('PollForm', () => {
-  const wrapper = (children: React.ReactNode) => (
-    <AuthContext.Provider value={{ user: mockUser, session: null }}>
-      {children}
-    </AuthContext.Provider>
-  );
-
   it('renders poll creation form', () => {
-    render(wrapper(<PollForm />));
+    render(withProviders(<PollForm />, { user: mockUser }));
     expect(screen.getByLabelText(/question/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/description/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
   });
 
   it('shows validation errors on submit with empty fields', async () => {
-    render(wrapper(<PollForm />));
+    render(withProviders(<PollForm />, { user: mockUser }));
     fireEvent.click(screen.getByRole('button', { name: /create/i }));
     expect(await screen.findAllByText(/required/i)).not.toHaveLength(0);
   });

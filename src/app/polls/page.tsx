@@ -1,14 +1,20 @@
 
+
+
 import { PollList } from "@/components/PollList";
 import { getPolls } from "@/lib/supabase";
 import { Poll } from "@/types";
+import Link from "next/link";
 
-export default async function PollsPage() {
+export default async function PollsPage({ searchParams }: { searchParams?: { page?: string } }) {
+  const PAGE_SIZE = 20;
+  const safeParams = searchParams || {};
+  const page = Number(safeParams.page) > 0 ? Number(safeParams.page) : 1;
   let polls: Poll[] = [];
   let error: string | null = null;
 
   try {
-    polls = await getPolls({ limit: 20, offset: 0 });
+    polls = await getPolls({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE });
   } catch (err) {
     console.error("Error fetching polls:", err);
     error = "Failed to load polls. Please check your database connection.";
@@ -25,7 +31,21 @@ export default async function PollsPage() {
           </p>
         </div>
       ) : (
-        <PollList polls={polls} />
+        <>
+          <PollList polls={polls} />
+          <div className="flex justify-center gap-4 mt-8">
+            <Link href={`/polls?page=${page - 1}`} passHref legacyBehavior>
+              <button className="px-4 py-2 rounded bg-gray-200 disabled:opacity-50" disabled={page <= 1}>
+                Previous
+              </button>
+            </Link>
+            <Link href={`/polls?page=${page + 1}`} passHref legacyBehavior>
+              <button className="px-4 py-2 rounded bg-gray-200" disabled={polls.length < PAGE_SIZE}>
+                Next
+              </button>
+            </Link>
+          </div>
+        </>
       )}
     </div>
   );

@@ -13,8 +13,8 @@ jest.mock('next/navigation', () => ({
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PollOwnerActions from "../PollOwnerActions";
-import { AuthContext } from "@/context/AuthContext";
-import React from "react";
+import { withProviders } from '@/test-utils';
+import type { User } from '@/types';
 import * as supabaseLib from "@/lib/supabase";
 
 const poll = {
@@ -27,21 +27,13 @@ const poll = {
   createdAt: new Date(),
 };
 
-import type { User as SupabaseUser } from "@supabase/supabase-js";
-const makeUser = (id: string): SupabaseUser => ({
+const makeUser = (id: string): User => ({
   id,
   email: id + "@test.com",
-  user_metadata: { name: "Test User" },
-  app_metadata: {},
-  aud: "authenticated",
-  created_at: new Date().toISOString(),
+  name: "Test User",
 });
-const renderWithUser = (user: SupabaseUser | null) =>
-  render(
-    <AuthContext.Provider value={{ user, session: null }}>
-      <PollOwnerActions poll={poll} />
-    </AuthContext.Provider>
-  );
+const renderWithUser = (user: User | null) =>
+  render(withProviders(<PollOwnerActions poll={poll} />, { user }));
 
 describe("PollOwnerActions", () => {
   it("does not render for non-owner", () => {
