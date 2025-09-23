@@ -33,10 +33,8 @@ const getAuthFormSchema = (mode: "login" | "register") => {
 
   return z.object({
     ...baseSchema,
-    name: z.string().optional(),
   });
 };
-
 type AuthFormValues = z.infer<ReturnType<typeof getAuthFormSchema>>;
 
 interface AuthFormProps {
@@ -80,10 +78,9 @@ export function AuthForm({ mode }: AuthFormProps) {
       } else {
         if (!data.name) {
           throw new Error("Name is required for registration");
-        }
-        console.log('📝 Attempting registration...');
-        const { error } = await signUp(data.email, data.password, data.name);
-        if (error) {
+} else {
+  console.log('📝 Attempting registration...');
+  const { error } = await signUp(data.email, data.password, data.name);        if (error) {
           console.error('❌ Registration failed:', error.message);
           throw new Error(error.message);
         }
