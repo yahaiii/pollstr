@@ -63,12 +63,12 @@ export default function PollOwnerActions({ poll }: { poll: Poll }) {
           </DialogHeader>
           <div className="space-y-3">
             <div>
-              <label className="block text-sm mb-1">Title</label>
-              <Input value={title} onChange={(e) => setTitle(e.target.value)} />
+              <label htmlFor="edit-title" className="block text-sm mb-1">Title</label>
+              <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm mb-1">Description</label>
-              <Input value={description} onChange={(e) => setDescription(e.target.value)} />
+              <label htmlFor="edit-description" className="block text-sm mb-1">Description</label>
+              <Input id="edit-description" value={description} onChange={(e) => setDescription(e.target.value)} />
             </div>
             {error && <p className="text-sm text-red-600">{error}</p>}
             <div className="flex justify-end gap-2">
