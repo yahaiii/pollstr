@@ -1,3 +1,28 @@
+## Project Structure
+
+The main project structure is as follows:
+
+```
+pollstr/
+├── app/                # Next.js App Router pages and routes
+│   ├── auth/           # Authentication pages (login, register)
+│   ├── create-poll/    # Poll creation page
+│   ├── polls/          # Poll listing and voting pages
+│   └── ...             # Other route segments
+├── components/         # Custom and UI components
+│   ├── ui/             # shadcn/ui components
+│   └── ...             # Other reusable components
+├── context/            # React context providers (e.g., AuthContext)
+├── hooks/              # Custom React hooks
+├── lib/                # Supabase client, utilities, and server actions
+├── types/              # TypeScript type definitions
+├── public/             # Static assets (images, icons, etc.)
+├── .env.local          # Environment variables (not committed)
+├── package.json        # Project dependencies and scripts
+├── README.md           # Project documentation
+└── ...                 # Other config and setup files
+```
+
 ---
 title: Pollstr Copilot Instructions
 description: Core rules, conventions, and architectural guidelines for the Polling App with QR Code Sharing project.
