@@ -1,4 +1,9 @@
-require('dotenv').config({ path: '.env.test' });
+// Load .env.test for Jest using ESM-compatible dynamic import
+if (process.env.NODE_ENV === 'test') {
+  (async () => {
+    await import('dotenv').then(dotenv => dotenv.config({ path: '.env.test' }));
+  })();
+}
 module.exports = {
   testEnvironment: 'jsdom',
   setupFilesAfterEnv: ['@testing-library/jest-dom'],
