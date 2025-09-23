@@ -1,3 +1,4 @@
+
 import { PollList } from "@/components/PollList";
 import { getPolls } from "@/lib/supabase";
 import { Poll } from "@/types";
@@ -7,7 +8,7 @@ export default async function PollsPage() {
   let error: string | null = null;
 
   try {
-    polls = await getPolls();
+    polls = await getPolls({ limit: 20, offset: 0 });
   } catch (err) {
     console.error("Error fetching polls:", err);
     error = "Failed to load polls. Please check your database connection.";

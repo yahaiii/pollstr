@@ -210,18 +210,15 @@ export async function createPoll(poll: {
   return { poll: pollData, options };
 }
 
-export async function getPolls(): Promise<Poll[]> {
+export async function getPolls({ limit = 20, offset = 0 } = {}): Promise<Poll[]> {
   try {
     console.log('📊 Fetching polls...');
     const supabaseClient = createServerClient();
-    
     const { data: polls, error } = await supabaseClient
       .from('polls')
-      .select(`
-        *,
-        poll_options (*)
-      `)
-      .order('created_at', { ascending: false });
+      .select(`*, poll_options (*)`)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
 
     if (error) {
       console.error('❌ Error fetching polls:', error);
