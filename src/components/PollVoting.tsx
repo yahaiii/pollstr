@@ -5,6 +5,7 @@ import { Poll } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { voteOnPoll, hasUserVoted } from "@/lib/supabase";
+import { PollResultsChart } from "./PollResultsChart";
 import { useRouter } from "next/navigation";
 import { ClientOnly } from "./ClientOnly";
 import { useAuth } from "@/hooks/useAuth";
@@ -90,24 +91,30 @@ export function PollVoting({ poll }: PollVotingProps) {
           <CardHeader>
             <CardTitle>Poll Results</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {poll.options.map((option) => {
-              const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
-              return (
-                <div key={option.id} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>{option.text}</span>
-                    <span>{option.votes} votes ({percentage.toFixed(1)}%)</span>
+          <CardContent className="space-y-6">
+            <PollResultsChart
+              options={poll.options.map(o => o.text)}
+              votes={poll.options.map(o => o.votes)}
+            />
+            <div className="space-y-4">
+              {poll.options.map((option) => {
+                const percentage = totalVotes > 0 ? (option.votes / totalVotes) * 100 : 0;
+                return (
+                  <div key={option.id} className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>{option.text}</span>
+                      <span>{option.votes} votes ({percentage.toFixed(1)}%)</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
             <div className="pt-4 text-sm text-muted-foreground">
               Total votes: {totalVotes}
             </div>
