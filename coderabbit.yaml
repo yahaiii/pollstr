@@ -101,32 +101,38 @@ reviews:
         - Validate JWT handling
         - Monitor for brute force protection
 
-  # Severity levels for different types of issues
-  severity:
-    critical:
-      - security_vulnerabilities
-      - memory_leaks
-      - authentication_bypass
-      - data_exposure
-    high:
-      - performance_issues
-      - security_misconfiguration
-      - insecure_dependencies
-    medium:
-      - code_style_violations
-      - accessibility_issues
-      - type_safety_concerns
-    low:
-      - documentation_missing
-      - code_duplication
-      - naming_conventions
+  # Review tone and approach
+  tone: "constructive"
+  
+  # Focus areas for reviews
+  review_focus:
+    - security
+    - performance
+    - maintainability
+    - accessibility
+    - testing
 
-  # AI-powered code metrics
-  code_metrics:
-    enabled: true
-    analyze:
-      - cyclomatic_complexity
-      - cognitive_complexity
-      - maintainability_index
-      - code_duplication
-      - test_coverage
+  # Early access features
+  early_access: false
+
+  # Tool-specific configurations
+  tools:
+    # Complexity analysis with radon
+    radon:
+      enabled: true
+      cyclomatic_complexity: true
+      cognitive_complexity: true
+      maintainability_index: true
+
+    # Code duplication detection
+    jscpd:
+      enabled: true
+      threshold: 10
+      min_lines: 5
+      min_tokens: 50
+
+    # Test coverage analysis
+    jest:
+      enabled: true
+      coverage_threshold: 80
+      report_coverage: true
