@@ -1,5 +1,4 @@
 "use client";
-"use client";
 import React, { useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { useRef } from "react";

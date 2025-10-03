@@ -32,7 +32,7 @@ export default async function PollPage({ params }: { params: Promise<{ id: strin
             <span>{poll.options.length} options</span>
             <span className="flex-1" />
             <PollOwnerActions poll={poll} />
-            <PollShareModal pollId={poll.id} pollTitle={poll.title} />
+            <PollShareModal pollId={poll.id} />
           </div>
         </div>
         
