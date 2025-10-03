@@ -6,10 +6,18 @@ import { getPolls } from "@/lib/supabase";
 import { Poll } from "@/types";
 import Link from "next/link";
 
-export default async function PollsPage({ searchParams }: { searchParams?: { page?: string } }) {
+
+type SearchParams = { page?: string } | Promise<{ page?: string }>;
+
+function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
+  return !!value && typeof (value as unknown as { then?: unknown }).then === 'function';
+}
+
+export default async function PollsPage({ searchParams }: { searchParams?: SearchParams }) {
   const PAGE_SIZE = 20;
-  const safeParams = searchParams || {};
-  const page = Number(safeParams.page) > 0 ? Number(safeParams.page) : 1;
+  // Await searchParams if it's a Promise (Next.js 15+ dynamic API)
+  const params = isPromise(searchParams) ? await searchParams : searchParams || {};
+  const page = Number(params.page) > 0 ? Number(params.page) : 1;
   let polls: Poll[] = [];
   let error: string | null = null;
 

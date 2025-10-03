@@ -71,3 +71,6 @@ Before finalizing your response, you MUST verify the following:
 - Is the Supabase client used for all database interactions?
 - Are shadcn/ui components used for the UI where appropriate?
 - Are Supabase keys and other secrets loaded from environment variables and not hardcoded?
+
+## additional Guidelines
+- after every modification, check #problems and fix any issues there.

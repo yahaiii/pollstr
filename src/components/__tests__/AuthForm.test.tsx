@@ -1,3 +1,4 @@
+import React from 'react';
 // Mock next/navigation's useRouter for Next.js App Router context
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -12,12 +13,15 @@ jest.mock('next/navigation', () => ({
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AuthForm } from '../AuthForm';
 import { withProviders } from '@/test-utils';
-import type { User } from '@/types';
+import type { User } from '@supabase/supabase-js';
 
 const mockUser: User = {
   id: '1',
   email: 'test@test.com',
-  name: 'Test User',
+  app_metadata: {},
+  user_metadata: { name: 'Test User' },
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
 };
 
 describe('AuthForm', () => {

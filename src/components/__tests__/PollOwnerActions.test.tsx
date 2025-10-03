@@ -1,3 +1,4 @@
+import React from 'react';
 // Mock next/navigation's useRouter to prevent 'expected app router to be mounted' error
 jest.mock('next/navigation', () => ({
   useRouter: () => ({
@@ -14,7 +15,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import PollOwnerActions from "../PollOwnerActions";
 import { withProviders } from '@/test-utils';
-import type { User } from '@/types';
+import type { User } from '@supabase/supabase-js';
 import * as supabaseLib from "@/lib/supabase";
 
 const poll = {
@@ -30,7 +31,10 @@ const poll = {
 const makeUser = (id: string): User => ({
   id,
   email: id + "@test.com",
-  name: "Test User",
+  app_metadata: {},
+  user_metadata: { name: 'Test User' },
+  aud: 'authenticated',
+  created_at: new Date().toISOString(),
 });
 const renderWithUser = (user: User | null) =>
   render(withProviders(<PollOwnerActions poll={poll} />, { user }));
