@@ -1,5 +1,8 @@
 "use client";
+"use client";
 import React, { useState } from "react";
+import { QRCodeCanvas } from "qrcode.react";
+import { useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
@@ -9,9 +12,20 @@ interface PollShareModalProps {
 
 export function PollShareModal({ pollId }: PollShareModalProps) {
   const [open, setOpen] = useState(false);
+  const qrRef = useRef<HTMLCanvasElement>(null);
   const pollUrl = typeof window !== "undefined"
     ? `${window.location.origin}/polls/${pollId}`
     : `/polls/${pollId}`;
+
+  const handleDownloadQR = () => {
+    const canvas = qrRef.current;
+    if (!canvas) return;
+    const url = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `poll-${pollId}-qr.png`;
+    link.click();
+  };
 
   return (
     <>
@@ -42,7 +56,18 @@ export function PollShareModal({ pollId }: PollShareModalProps) {
                 Copy Link
               </Button>
             </div>
-            {/* QR code will be added in step 3 */}
+            <div>
+              <label className="block text-sm mb-1">QR Code</label>
+              <div className="flex justify-center py-2">
+                <QRCodeCanvas value={pollUrl} size={128} ref={qrRef} />
+              </div>
+              <p className="text-xs text-muted-foreground text-center">Scan to open poll</p>
+              <div className="flex justify-center mt-2">
+                <Button type="button" size="sm" variant="outline" onClick={handleDownloadQR}>
+                  Download QR
+                </Button>
+              </div>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
