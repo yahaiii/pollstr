@@ -18,10 +18,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </head>
       <body className={inter.className}>
         <AuthProvider>
           <Navigation />
-          <main className="min-h-screen bg-background">
+          <main className="min-h-screen bg-background px-4 max-w-full sm:px-6 sm:max-w-3xl mx-auto">
             {children}
           </main>
         </AuthProvider>

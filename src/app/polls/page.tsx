@@ -26,8 +26,8 @@ export default async function PollsPage({ searchParams }: { searchParams?: Searc
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-4xl font-bold mb-8">Polls</h1>
+    <div className="container mx-auto py-6 md:py-8 px-0">
+      <h1 className="text-3xl md:text-4xl font-bold mb-6 md:mb-8">Polls</h1>
       {error ? (
         <div className="text-red-600 bg-red-50 p-4 rounded-md">
           {error}
@@ -38,28 +38,28 @@ export default async function PollsPage({ searchParams }: { searchParams?: Searc
       ) : (
         <>
           <PollList polls={polls} />
-          <div className="flex justify-center gap-4 mt-8">
+          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 mt-8">
             {page > 1 ? (
               <Link
                 href={`/polls?page=${page - 1}`}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-center"
               >
                 Previous
               </Link>
             ) : (
-              <span className="px-4 py-2 rounded bg-gray-200 opacity-50 cursor-not-allowed">
+              <span className="px-4 py-2 rounded bg-gray-200 opacity-50 cursor-not-allowed text-center">
                 Previous
               </span>
             )}
             {polls.length >= PAGE_SIZE ? (
               <Link
                 href={`/polls?page=${page + 1}`}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 text-center"
               >
                 Next
               </Link>
             ) : (
-              <span className="px-4 py-2 rounded bg-gray-200 opacity-50 cursor-not-allowed">
+              <span className="px-4 py-2 rounded bg-gray-200 opacity-50 cursor-not-allowed text-center">
                 Next
               </span>
             )}

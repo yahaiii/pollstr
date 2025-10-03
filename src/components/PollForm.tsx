@@ -128,7 +128,7 @@ export function PollForm() {
               )}
             />
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               {form.watch("options").map((option, index) => (
                 <FormField
                   key={index}
@@ -136,8 +136,8 @@ export function PollForm() {
                   name={`options.${index}`}
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex items-center gap-2">
-                        <FormControl>
+                      <div className="flex flex-col gap-2 w-full sm:flex-row sm:items-center">
+                        <FormControl className="flex-1">
                           <Input placeholder={`Option ${index + 1}`} {...field} />
                         </FormControl>
                         {form.watch("options").length > 2 && (
@@ -145,6 +145,7 @@ export function PollForm() {
                             type="button"
                             variant="outline"
                             onClick={() => removeOption(index)}
+                            className="w-full sm:w-auto"
                           >
                             Remove
                           </Button>
@@ -163,11 +164,11 @@ export function PollForm() {
               </div>
             )}
 
-            <div className="flex gap-4">
-              <Button type="button" variant="outline" onClick={addOption}>
+            <div className="flex flex-col gap-2 w-full sm:flex-row sm:gap-4">
+              <Button type="button" variant="outline" onClick={addOption} className="w-full sm:w-auto">
                 Add Option
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
                 {isLoading ? "Creating..." : "Create Poll"}
               </Button>
             </div>

@@ -51,14 +51,14 @@ export default function PollOwnerActions({ poll }: { poll: Poll }) {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>Edit</Button>
-      <Button variant="destructive" size="sm" onClick={onDelete} disabled={isDeleting}>
+    <div className="flex flex-col gap-3 w-full sm:flex-row sm:items-center sm:gap-2 flex-wrap">
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="w-full min-h-[44px] sm:w-auto">Edit</Button>
+      <Button variant="destructive" size="sm" onClick={onDelete} disabled={isDeleting} className="w-full min-h-[44px] sm:w-auto">
         {isDeleting ? "Deleting..." : "Delete"}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+  <DialogContent className="max-w-full w-[98vw] sm:max-w-md sm:w-[95%]">
           <DialogHeader>
             <DialogTitle>Edit Poll</DialogTitle>
           </DialogHeader>

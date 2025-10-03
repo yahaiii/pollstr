@@ -28,7 +28,7 @@ export function PollShareModal({ pollId }: PollShareModalProps) {
 
   return (
     <>
-      <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
+      <Button variant="outline" size="sm" onClick={() => setOpen(true)} className="w-full min-h-[44px] sm:w-auto">
         Share
       </Button>
       <Dialog open={open} onOpenChange={setOpen}>
@@ -50,7 +50,23 @@ export function PollShareModal({ pollId }: PollShareModalProps) {
                 type="button"
                 size="sm"
                 className="mt-2"
-                onClick={() => navigator.clipboard.writeText(pollUrl)}
+                onClick={() => {
+                  if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(pollUrl);
+                  } else {
+                    // Fallback for mobile browsers
+                    const input = document.createElement('input');
+                    input.value = pollUrl;
+                    document.body.appendChild(input);
+                    input.select();
+                    try {
+                      document.execCommand('copy');
+                    } catch {
+                      // Optionally show error
+                    }
+                    document.body.removeChild(input);
+                  }
+                }}
               >
                 Copy Link
               </Button>
