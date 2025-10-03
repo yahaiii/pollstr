@@ -1,14 +1,25 @@
-
 import { PollList } from "@/components/PollList";
 import { getPolls } from "@/lib/supabase";
 import { Poll } from "@/types";
+import Link from "next/link";
 
-export default async function PollsPage() {
+
+type SearchParams = { page?: string } | Promise<{ page?: string }>;
+
+function isPromise<T>(value: T | Promise<T>): value is Promise<T> {
+  return !!value && typeof (value as unknown as { then?: unknown }).then === 'function';
+}
+
+export default async function PollsPage({ searchParams }: { searchParams?: SearchParams }) {
+  const PAGE_SIZE = 20;
+  // Await searchParams if it's a Promise (Next.js 15+ dynamic API)
+  const params = isPromise(searchParams) ? await searchParams : searchParams || {};
+  const page = Number(params.page) > 0 ? Number(params.page) : 1;
   let polls: Poll[] = [];
   let error: string | null = null;
 
   try {
-    polls = await getPolls({ limit: 20, offset: 0 });
+    polls = await getPolls({ limit: PAGE_SIZE, offset: (page - 1) * PAGE_SIZE });
   } catch (err) {
     console.error("Error fetching polls:", err);
     error = "Failed to load polls. Please check your database connection.";
@@ -25,7 +36,35 @@ export default async function PollsPage() {
           </p>
         </div>
       ) : (
-        <PollList polls={polls} />
+        <>
+          <PollList polls={polls} />
+          <div className="flex justify-center gap-4 mt-8">
+            {page > 1 ? (
+              <Link
+                href={`/polls?page=${page - 1}`}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Previous
+              </Link>
+            ) : (
+              <span className="px-4 py-2 rounded bg-gray-200 opacity-50 cursor-not-allowed">
+                Previous
+              </span>
+            )}
+            {polls.length >= PAGE_SIZE ? (
+              <Link
+                href={`/polls?page=${page + 1}`}
+                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+              >
+                Next
+              </Link>
+            ) : (
+              <span className="px-4 py-2 rounded bg-gray-200 opacity-50 cursor-not-allowed">
+                Next
+              </span>
+            )}
+          </div>
+        </>
       )}
     </div>
   );
