@@ -33,6 +33,13 @@ export function Navigation() {
 
   const NavLinks = () => (
     <>
+      {user && (
+        <Link href="/dashboard">
+          <Button variant={pathname === "/dashboard" ? "default" : "ghost"} className="w-full justify-start md:w-auto">
+            Dashboard
+          </Button>
+        </Link>
+      )}
       <Link href="/polls">
         <Button variant={pathname === "/polls" ? "default" : "ghost"} className="w-full justify-start md:w-auto">
           Polls

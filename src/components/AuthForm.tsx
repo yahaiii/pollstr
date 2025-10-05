@@ -63,9 +63,9 @@ export function AuthForm({ mode }: AuthFormProps) {
           console.error('❌ Login failed:', result.error.message);
           throw new Error(result.error.message);
         }
-        console.log('✅ Login successful, redirecting to /polls');
+        console.log('✅ Login successful, redirecting to /dashboard');
         setTimeout(() => {
-          router.push("/polls");
+          router.push("/dashboard");
         }, 100);
       } else {
         const { email, password, name } = data as RegisterFormValues;
